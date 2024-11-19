@@ -1,5 +1,5 @@
-import '../models/data_layer.dart';
 import 'package:flutter/material.dart';
+import '../models/data_layer.dart';
 
 class PlanScreen extends StatefulWidget {
   const PlanScreen({super.key});
@@ -10,7 +10,6 @@ class PlanScreen extends StatefulWidget {
 
 class _PlanScreenState extends State<PlanScreen> {
   Plan plan = const Plan();
-  
   late ScrollController scrollController;
 
   @override
@@ -23,10 +22,23 @@ class _PlanScreenState extends State<PlanScreen> {
   }
 
   @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Moh. Rendi Setiawa')),
-      body: _buildList(),
+      appBar: AppBar(title: const Text('Master Plan Namaku')),
+      body: Column(
+        children: [
+          Expanded(child: _buildList()),
+          SafeArea(
+            child: Text('${plan.tasks.where((t) => t.complete).length} of ${plan.tasks.length} tasks completed'),
+          ),
+        ],
+      ),
       floatingActionButton: _buildAddTaskButton(),
     );
   }
@@ -89,11 +101,5 @@ class _PlanScreenState extends State<PlanScreen> {
         },
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    scrollController.dispose();
-    super.dispose();
   }
 }
