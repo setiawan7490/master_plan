@@ -1,6 +1,14 @@
 ## Tugas_Praktikum_1
 
-1. 
+1. Dokumentasikan langkah-langkah dan hasil akhir (GIF)
+Langkah-langkah sudah dijelaskan dan dijalankan sesuai praktikum:
+
+Membuat task.dart untuk model tugas.
+Membuat plan.dart untuk daftar tugas.
+Menyusun data_layer.dart untuk mengelola ekspor model.
+Implementasi main.dart dengan MaterialApp.
+Membuat plan_screen.dart untuk layar daftar rencana.
+Menambahkan scroll controller dan lifecycle methods (initState, dispose).
 
 2. Langkah 4 membuat file data_layer.dart yang mengumpulkan semua model (task.dart dan plan.dart) agar lebih mudah diimpor ke file lain dalam satu langkah.
 

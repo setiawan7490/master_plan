@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import '../models/data_layer.dart';
+import '../providers/plan_provider.dart';
 
 class PlanScreen extends StatefulWidget {
-  const PlanScreen({super.key});
+  final Plan plan;
+
+  const PlanScreen({super.key, required this.plan});
 
   @override
   State createState() => _PlanScreenState();
 }
 
 class _PlanScreenState extends State<PlanScreen> {
-  Plan plan = const Plan();
   late ScrollController scrollController;
+
+  Plan get plan => widget.plan;
 
   @override
   void initState() {
@@ -29,52 +33,54 @@ class _PlanScreenState extends State<PlanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ValueNotifier<List<Plan>> plansNotifier = PlanProvider.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Master Plan Namaku')),
+      appBar: AppBar(title: Text(plan.name)),
       body: Column(
         children: [
-          Expanded(child: _buildList()),
-          SafeArea(
-            child: Text('${plan.tasks.where((t) => t.complete).length} of ${plan.tasks.length} tasks completed'),
-          ),
+          Expanded(child: _buildList(plansNotifier)),
+          SafeArea(child: Text(plan.completenessMessage)),
         ],
       ),
-      floatingActionButton: _buildAddTaskButton(),
+      floatingActionButton: _buildAddTaskButton(plansNotifier),
     );
   }
 
-  Widget _buildAddTaskButton() {
+  Widget _buildAddTaskButton(ValueNotifier<List<Plan>> plansNotifier) {
     return FloatingActionButton(
       child: const Icon(Icons.add),
       onPressed: () {
-        setState(() {
-          plan = Plan(
+        int planIndex =
+            plansNotifier.value.indexWhere((p) => p.name == plan.name);
+        plansNotifier.value = List<Plan>.from(plansNotifier.value)
+          ..[planIndex] = Plan(
             name: plan.name,
             tasks: List<Task>.from(plan.tasks)..add(const Task()),
           );
-        });
       },
     );
   }
 
-  Widget _buildList() {
+  Widget _buildList(ValueNotifier<List<Plan>> plansNotifier) {
     return ListView.builder(
       controller: scrollController,
-      keyboardDismissBehavior: Theme.of(context).platform == TargetPlatform.iOS
-          ? ScrollViewKeyboardDismissBehavior.onDrag
-          : ScrollViewKeyboardDismissBehavior.manual,
       itemCount: plan.tasks.length,
-      itemBuilder: (context, index) => _buildTaskTile(plan.tasks[index], index),
+      itemBuilder: (context, index) =>
+          _buildTaskTile(plan.tasks[index], index, plansNotifier),
     );
   }
 
-  Widget _buildTaskTile(Task task, int index) {
+  Widget _buildTaskTile(
+      Task task, int index, ValueNotifier<List<Plan>> plansNotifier) {
     return ListTile(
       leading: Checkbox(
         value: task.complete,
         onChanged: (selected) {
-          setState(() {
-            plan = Plan(
+          int planIndex =
+              plansNotifier.value.indexWhere((p) => p.name == plan.name);
+          plansNotifier.value = List<Plan>.from(plansNotifier.value)
+            ..[planIndex] = Plan(
               name: plan.name,
               tasks: List<Task>.from(plan.tasks)
                 ..[index] = Task(
@@ -82,14 +88,15 @@ class _PlanScreenState extends State<PlanScreen> {
                   complete: selected ?? false,
                 ),
             );
-          });
         },
       ),
       title: TextFormField(
         initialValue: task.description,
         onChanged: (text) {
-          setState(() {
-            plan = Plan(
+          int planIndex =
+              plansNotifier.value.indexWhere((p) => p.name == plan.name);
+          plansNotifier.value = List<Plan>.from(plansNotifier.value)
+            ..[planIndex] = Plan(
               name: plan.name,
               tasks: List<Task>.from(plan.tasks)
                 ..[index] = Task(
@@ -97,7 +104,6 @@ class _PlanScreenState extends State<PlanScreen> {
                   complete: task.complete,
                 ),
             );
-          });
         },
       ),
     );
